@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scarlet Ashen Rose</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    background: #000;
+    color: #eee;
+    font-family: 'Unbounded', Quintessential;
+    overflow-x: hidden;
+}
+
+header {
+    text-align: center;
+    padding: 100px 20px;
+    background: radial-gradient(circle at center, #220000 0%, #000 70%);
+}
+
+h1 {
+    font-size: 48px;
+    color: #aa0000;
+    text-shadow: 0 0 20px #550000;
+}
+.subtitle {
+    opacity: 0.7;
+    margin-top: 10px;
+}
+
+.games {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 40px;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #550000;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background: #aa0000;
+    box-shadow: 0 0 15px #aa0000;
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+@media(max-width: 768px){
+    h1 {
+        font-size: 32px;
+    }
+
+    .games {
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Scarlet Ashen Rose</h1>
+    <div class="subtitle">First Froten, then the game developer, that's the focus. I know where there's silence...</div>
+</header>
+
+<section class="games">
+<h1>My game:</h1>
+   <div class="card">
+        <h2>Buhekz</h2>
+        <p>An interesting game with aliens.</p>
+        <a href="game1.html" class="btn">More details</a>
+    </div>
+
+</section>
+
+<footer>
+© 2026 Scarlet Ashen Rose
+</footer>
+
+<script>
+document.addEventListener("keydown", function(e){
+    document.body.style.background = "#0a0000";
+    setTimeout(()=>{
+        document.body.style.background = "#000";
+    },100);
+});
+</script>
+
+</body>
+</html>
+
