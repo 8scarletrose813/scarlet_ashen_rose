@@ -1,74 +1,192 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
-<link rel="icon" href="rose.png" type="image/png">
+<title>Scarlet Ashen Rose</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-body {
-    margin: 0;
-    background: #000;
-    color: #eee;
-    font-family: 'Unbounded', Quintessential;
-    overflow-x: hidden;
-}
-
-header {
-    text-align: center;
-    padding: 100px 20px;
-    background: radial-gradient(circle at center, #220000 0%, #000 70%);
-}
-
-h1 {
-    font-size: 48px;
-    color: #aa0000;
-    text-shadow: 0 0 20px #550000;
-}
-.subtitle {
-    opacity: 0.7;
-    margin-top: 10px;
-}
-
-.games {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 60px 20px;
-    gap: 40px;
-}
-
-.btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: #550000;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: 0.3s;
-}
-
-.btn:hover {
-    background: #aa0000;
-    box-shadow: 0 0 15px #aa0000;
-}
-
-footer {
-    text-align: center;
-    padding: 30px;
-    font-size: 14px;
-    opacity: 0.5;
-}
-
-@media(max-width: 768px){
-    h1 {
-        font-size: 32px;
+    :root {
+        --accent: #8a0000; 
+        --bg: #050505;
+        --text: #c0c0c0;
+        --card-bg: rgba(20, 20, 20, 0.4);
+        --border: rgba(255, 255, 255, 0.05);
     }
 
-    .games {
+    body {
+        margin: 0;
+        background-color: var(--bg);
+        background-image: linear-gradient(to bottom, #0a0000, #000000);
+        color: var(--text);
+        font-family: 'Montserrat', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    h1, h2 {
+        font-family: 'Cinzel', serif;
+        font-weight: 400;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: #ffffff;
+        margin: 0;
+        color: rgba(255, 255, 255);
+    }
+
+    a { text-decoration: none; color: inherit; transition: 0.4s; }
+
+    header {
+        padding: 100px 20px 40px;
+        text-align: center;
+        animation: fadeUp 1.5s ease-out;
+    }
+
+    h1 {
+        font-size: 3rem;
+        text-shadow: 0 0 20px rgba(138, 0, 0, 0.5);
+    }
+
+    .subtitle {
+        margin-top: 15px;
+        font-size: 0.9rem;
+        letter-spacing: 3px;
+        color: #ffffff;
+    }
+
+    .divider {
+        height: 1px;
+        width: 60px;
+        background: var(--accent);
+        margin: 30px auto;
+        opacity: 0.7;
+        box-shadow: 0 0 10px var(--accent);
+    }
+
+    .about {
+        max-width: 700px;
+        margin: 0 auto 40px;
+        text-align: center;
+        font-size: 1rem;
+        line-height: 1.8;
+        color: #aaa;
+        padding: 0 20px;
+    }
+    .skills-bar {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 80px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        color: var(--accent);
+        flex-wrap: wrap;
+    }
+
+    .skill {
+        position: relative;
+        padding: 0 10px;
+    }
+    
+    .skill::after {
+        content: '/';
+        position: absolute;
+        right: -20px;
+        color: #333;
+    }
+    .skill:last-child::after { content: ''; }
+
+    .grid {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        padding: 0 20px 100px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        width: 300px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 40px 30px;
+        transition: 0.4s;
+        position: relative;
+        display: flex;
         flex-direction: column;
         align-items: center;
+        text-align: center;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        background: rgba(40, 10, 10, 0.15); 
+        border-color: var(--accent);
+        box-shadow: 0 0 30px rgba(138, 0, 0, 0.1);
+    }
+
+    .card-icon {
+        font-size: 2rem;
+        color: #444;
+        margin-bottom: 25px;
+        transition: 0.4s;
+    }
+    
+    .card:hover .card-icon { 
+        color: var(--accent); 
+        text-shadow: 0 0 10px var(--accent);
+    }
+
+    .card h2 { font-size: 1.4rem; margin-bottom: 15px; }
+    .card p { font-size: 0.85rem; color: #888; margin-bottom: 30px; line-height: 1.6; }
+
+    .btn-link {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #fff;
+        border: 1px solid var(--accent);
+        padding: 10px 25px;
+        transition: 0.3s;
+    }
+
+    .btn-link:hover { 
+        background: var(--accent); 
+        color: #000; 
+        box-shadow: 0 0 15px var(--accent);
+    }
+    footer {
+        margin-top: auto;
+        text-align: center;
+        padding: 60px 20px;
+        border-top: 1px solid rgba(255,255,255,0.02);
+        font-size: 0.7rem;
+        color: #444;
+    }
+
+    .socials {
+        display: flex;
+        justify-content: center;
+        gap: 40px; 
+        margin-bottom: 30px;
+    }
+
+    .socials a {
+        font-size: 2rem; 
+        color: #666;
+        transition: 0.3s;
+    }
+
+    .socials a:hover { 
+        color: var(--accent); 
+        transform: scale(1.2);
+        filter: drop-shadow(0 0 8px var(--accent));
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 </head>
@@ -76,32 +194,54 @@ footer {
 
 <header>
     <h1>Scarlet Ashen Rose</h1>
-    <div class="subtitle">First Froten, then the game developer, that's the focus. I know where there's silence...</div>
+    <div class="divider"></div>
+    <div class="subtitle">Digital Void & Atmospheric Code</div>
 </header>
 
-<section class="games">
-<h1>My game:</h1>
-   <div class="card">
-        <h2>Buhekz</h2>
-        <p>An interesting game with aliens.</p>
-        <a href="game1.html" class="btn">More details</a>
-    </div>
-
+<section class="about">
+    <h2> 🦋Welcome to my humble site...🦋</h2>
+    <p>
+        <p>Tea, tea, come to the rescue☕. But in life, there can never be too much tea☕.</p>
+        💜 Lavender Soul: My Arch Linux is so purple it glows. If it's not aesthetic, it's not working. 💅<br>
+        🎮 Godot Master: Creating games because playing them wasn't enough to satisfy my imagination. 🎲<br>
+        🦉 Nature: A true Night Owl. I code best when the stars are out and the tea is hot. 🍵<br>
+        🎧 Safe Space: Lost in manga panels 📖, vibing to lo-fi 🎵, and existing in my own cozy dimension. ⛩️
+    </p>
 </section>
 
-<footer>
-© 2026 Scarlet Ashen Rose
-</footer>
+<div class="skills-bar">
+    <span class="skill">C++</span>
+    <span class="skill">Godot</span>
+    <span class="skill">JAVASCRIPT</span>
+    <span class="skill">PYTHON</span>
+    <span class="skill">HTML & CSS</span>
+</div>
 
-<script>
-document.addEventListener("keydown", function(e){
-    document.body.style.background = "#0a0000";
-    setTimeout(()=>{
-        document.body.style.background = "#000";
-    },100);
-});
-</script>
+<div class="grid">
+    <article class="card">
+        <div class="card-icon"><i class="fas fa-ghost"></i></div>
+        <h2>Buhekz</h2>
+        <p>An atmospheric survival game featuring unknown alien lifeforms. Survive the dark.</p>
+        <a href="game1.html" class="btn-link">Initialize</a>
+    </article>
+
+    <article class="card">
+        <div class="card-icon"><i class="fas fa-dungeon"></i></div>
+        <h2>The Coven</h2>
+        <p>Join the community. Write messages, share theories, and stay connected.</p>
+        <a href="community.html" class="btn-link">Enter</a>
+    </article>
+</div>
+
+<footer>
+    <div class="socials">
+        <a href="https://github.com/8scarletrose813" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://discord.gg/csvGzuxr" title="Discord"><i class="fab fa-discord"></i></a>
+        <a href="https://t.me/rosescarlet813" title="Telegram"><i class="fab fa-telegram"></i></a>
+        <a href="https://mail.google.com/mail/u/0/?tf=cm&to=8scarlet.rose813@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
+    </div>
+    © 2026 Scarlet Ashen Rose
+</footer>
 
 </body>
 </html>
-
