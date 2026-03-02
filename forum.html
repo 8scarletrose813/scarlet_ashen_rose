@@ -1,167 +1,257 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Coven | Inner Circle</title>
+<title>The Coven | Secure Channel</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+<style>
+:root{
+    --accent:#8a0000;
+    --admin-glow: rgba(255, 0, 0, 0.6);
+    --bg:#050505;
+    --text:#c0c0c0;
+}
+
+body{
+    margin:0; background:#000; color:var(--text);
+    font-family:'Montserrat',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+}
+
+/* AUTH SCREEN */
+#auth-screen{ position:fixed; inset:0; background:#000; z-index:1000; display:flex; justify-content:center; align-items:center; }
+.auth-box{ width:320px; padding:40px; border:1px solid #333; background:#0a0a0a; text-align:center; box-shadow: 0 0 30px rgba(138,0,0,0.2); }
+.auth-input{ width:100%; padding:12px; margin-bottom:15px; background:#111; border:none; border-bottom:1px solid #555; color:#fff; text-align:center; box-sizing:border-box; outline: none;}
+.auth-btn{ background:transparent; border:1px solid var(--accent); color:var(--accent); padding:10px 20px; cursor:pointer; font-family:'Cinzel',serif; width:100%; transition: 0.3s;}
+.auth-btn:hover{ background:var(--accent); color:#fff; }
+
+/* FORUM SCREEN */
+#forum-screen{ display:none; width:100%; max-width:800px; padding:20px; box-sizing:border-box;}
+.top-nav{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; padding:10px 0; margin-bottom:20px;}
+.nav-btn{ color:#666; background:none; border:none; cursor:pointer; font-size:1.1rem; margin-left:15px; transition: 0.3s;}
+.nav-btn:hover{ color:red; transform: scale(1.1); }
+
+.user-badge{ border:1px solid #444; padding:5px 15px; font-family:'Cinzel',serif; font-size:0.8rem; letter-spacing: 1px;}
+.user-badge.is-admin { border-color: red; color: red; box-shadow: 0 0 10px var(--admin-glow); text-shadow: 0 0 5px red;}
+
+/* INPUT AREA */
+.post-area{ background: rgba(15,15,15,0.9); padding:20px; margin-bottom:30px; border:1px solid #222; position: relative;}
+.writing-effect { 
+    font-family: 'Cinzel'; font-size: 0.6rem; color: var(--accent); 
+    margin-bottom: 5px; letter-spacing: 2px; text-transform: uppercase;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+
+textarea{ width:100%; background:#0a0a0a; border:1px solid #333; color:#fff; padding:10px; box-sizing:border-box; resize:none; outline: none; font-family: sans-serif;}
+textarea:focus { border-color: var(--accent); }
+
+.controls{ display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap: 10px;}
+.emoji-btn { background: none; border: 1px solid #333; color: #888; padding: 5px 10px; cursor: pointer; }
+.submit-btn{ background:var(--accent); border:none; padding:10px 25px; cursor:pointer; color:#fff; font-family:'Cinzel'; font-weight: bold;}
+
+.emoji-picker { 
+    position: absolute; bottom: 70px; left: 20px; background: #111; border: 1px solid #333; 
+    padding: 10px; display: none; grid-template-columns: repeat(5, 1fr); gap: 5px; z-index: 10;
+}
+.emoji-picker span { cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
+.emoji-picker span:hover { transform: scale(1.3); }
+
+/* MESSAGES */
+.feed{ display:flex; flex-direction:column; gap:20px; padding-bottom:50px;}
+.msg{ border:1px solid #222; background:rgba(15,15,15,0.5); padding:15px; position:relative; animation: fadeIn 0.4s ease;}
+@keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:0;} }
+
+/* ADMIN MESSAGE STYLE */
+.msg.admin-msg { 
+    border: 1px solid #ff0000; 
+    background: linear-gradient(to right, rgba(60, 0, 0, 0.3), transparent);
+    box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.1);
+}
+
+.msg-header{ display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.75rem; color: #666;}
+.author{ font-weight:600; font-family:'Cinzel'; color: #aaa;}
+.author.red { color: #ff3333 !important; text-shadow: 0 0 10px red; }
+
+/* MEDIA SIZE */
+.msg img, .msg video{ 
+    max-width: 200px; max-height: 200px; 
+    border: 1px solid #444; margin-top: 10px; display: block; border-radius: 4px;
+}
+.msg a{ color:#ff4444; text-decoration:none; display:inline-block; margin-top:10px; border:1px solid #444; padding:5px 10px; font-size:0.8rem;}
+
+.del-icon { color: #444; cursor: pointer; transition: 0.3s; font-size: 1rem; padding: 5px;}
+.del-icon:hover { color: red; transform: scale(1.2); }
+</style>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-<style>
-    :root { --accent: #8a0000; --bg: #050505; --text: #c0c0c0; --card: rgba(20, 20, 20, 0.95); }
-    body { margin: 0; background-color: var(--bg); background-image: linear-gradient(to bottom, #0a0000, #000000); color: var(--text); font-family: 'Montserrat', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-    
-    /* Верхняя панель */
-    .top-bar { width: 100%; padding: 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; background: rgba(0,0,0,0.8); position: sticky; top: 0; z-index: 10; }
-    .back-btn { text-decoration: none; color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
-    .back-btn:hover { color: var(--accent); }
-    .user-badge { border: 1px solid #333; padding: 5px 15px; font-family: 'Cinzel', serif; font-size: 0.8rem; color: #fff; }
-
-    h1 { font-family: 'Cinzel', serif; color: #fff; letter-spacing: 4px; margin-top: 40px; text-shadow: 0 0 15px var(--accent); }
-
-    /* Окно входа */
-    #auth-screen { position: fixed; inset: 0; background: #000; z-index: 99; display: flex; align-items: center; justify-content: center; }
-    .auth-box { border: 1px solid #333; padding: 40px; text-align: center; background: var(--card); box-shadow: 0 0 30px rgba(138,0,0,0.3); width: 320px; }
-    
-    /* Формы */
-    input, textarea { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 12px; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; outline: none; text-align: center; }
-    input:focus, textarea:focus { border-color: var(--accent); }
-    textarea { text-align: left; resize: vertical; min-height: 80px; }
-    
-    button { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 10px 30px; cursor: pointer; font-family: 'Cinzel', serif; text-transform: uppercase; transition: 0.3s; width: 100%; font-weight: bold; }
-    button:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent); }
-
-    /* Лента сообщений */
-    #forum-container { display: none; width: 100%; max-width: 800px; padding: 20px; box-sizing: border-box; padding-bottom: 100px; }
-    .feed { display: flex; flex-direction: column; gap: 20px; margin-top: 30px; }
-    .msg { background: rgba(255,255,255,0.02); border-left: 2px solid #333; padding: 15px; animation: fadeIn 0.5s; position: relative; }
-    .msg:hover { border-color: var(--accent); background: rgba(255,255,255,0.04); }
-    .msg-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #555; }
-    .msg-author { font-family: 'Cinzel', serif; color: #ddd; font-weight: bold; font-size: 1rem; }
-    .msg-author.admin { color: #ff3333; text-shadow: 0 0 8px red; }
-    .msg-text { white-space: pre-wrap; line-height: 1.5; color: #ccc; }
-    
-    .input-area { position: fixed; bottom: 0; left: 0; width: 100%; background: #050505; border-top: 1px solid #333; padding: 20px; display: flex; justify-content: center; gap: 10px; }
-    .input-wrapper { width: 100%; max-width: 800px; display: flex; gap: 10px; }
-    
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
-</style>
 </head>
 <body>
 
 <div id="auth-screen">
     <div class="auth-box">
-        <h2 style="font-family:'Cinzel',serif; color:#fff; margin-bottom:30px;">Identity Required</h2>
-        <input type="text" id="username" placeholder="Enter Codename">
-        <button onclick="enterForum()">Enter The Coven</button>
-        <br><br>
-        <a href="index.html" style="color:#444; font-size:0.8rem; text-decoration:none;">Go Back</a>
+        <h2 style="font-family:'Cinzel'; color:#fff; letter-spacing: 4px;">THE COVEN</h2>
+        <input id="uName" class="auth-input" placeholder="Codename">
+        <input id="uPass" type="password" class="auth-input" placeholder="Password">
+        <button class="auth-btn" onclick="auth()">ACCESS CHANNEL</button>
+        <div id="authErr" style="color:red; font-size:0.7rem; margin-top:10px;"></div>
     </div>
 </div>
 
-<div class="top-bar" id="topBar" style="display:none;">
-    <a href="index.html" class="back-btn"><i class="fas fa-chevron-left"></i> Main Page</a>
-    <div class="user-badge" id="userBadge">Guest</div>
-</div>
+<div id="forum-screen">
+    <div class="top-nav">
+        <a href="index.html" style="color:#444; text-decoration:none; font-size:0.7rem; font-family: 'Cinzel';"><i class="fas fa-eye"></i> <--HOME</a>
+        <div style="display:flex; align-items:center;">
+            <div id="admin-tools" style="display:none;">
+                <button title="Add New Admin" onclick="addAdminPrompt()" class="nav-btn"><i class="fas fa-user-plus"></i></button>
+                <button title="Purge All Messages" onclick="clearAllChat()" class="nav-btn"><i class="fas fa-ghost"></i></button>
+            </div>
+            <div class="user-badge" id="myBadge"></div>
+        </div>
+    </div>
 
-<div id="forum-container">
-    <h1>Inner Circle Forum</h1>
+    <div class="post-area">
+        <div class="writing-effect">Writing in shadows...</div>
+        <textarea id="msgText" placeholder="Whisper something..." rows="3" onkeypress="handleEnter(event)"></textarea>
+        <div id="emojiPicker" class="emoji-picker">
+            <span onclick="addEmoji('🍷')">🍷</span><span onclick="addEmoji('💀')">💀</span><span onclick="addEmoji('🕯️')">🕯️</span><span onclick="addEmoji('🩸')">🩸</span><span onclick="addEmoji('🖤')">🖤</span>
+            <span onclick="addEmoji('🥀')">🥀</span><span onclick="addEmoji('🌙')">🌙</span><span onclick="addEmoji('👑')">👑</span><span onclick="addEmoji('✨')">✨</span><span onclick="addEmoji('🔥')">🔥</span>
+        </div>
+        <div class="controls">
+            <div style="display: flex; gap: 5px;">
+                <button class="emoji-btn" onclick="toggleEmoji()"><i class="far fa-smile"></i></button>
+                <input type="file" id="fileIn" style="font-size:0.6rem; width: 120px; color: #444;">
+            </div>
+            <button onclick="send()" class="submit-btn">SEND</button>
+        </div>
+    </div>
     <div id="feed" class="feed"></div>
 </div>
 
-<div class="input-area" id="inputArea" style="display:none;">
-    <div class="input-wrapper">
-        <textarea id="message" placeholder="Write your message..." rows="1" style="margin:0; text-align:left;"></textarea>
-        <button onclick="sendMessage()" style="width: auto;"><i class="fas fa-paper-plane"></i></button>
-    </div>
-</div>
-
 <script>
-    // --- ТВОИ НАСТРОЙКИ (Взяты с твоего фото) ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyAF5-GRVfamtKPJ2uZOvzvQ-pb_EYp1bCY",
-      authDomain: "scarletashenrose.firebaseapp.com",
-      projectId: "scarletashenrose",
-      storageBucket: "scarletashenrose.firebasestorage.app",
-      messagingSenderId: "693752419291",
-      appId: "1:693752419291:web:f20b536bf4b507b4708dfe",
-      measurementId: "G-YMPDRZZZ2G",
-      // База данных (добавил на основе твоего ID)
-      databaseURL: "https://scarletashenrose-default-rtdb.firebaseio.com"
+const firebaseConfig = {
+  apiKey: "AIzaSyAF5-GRVfamtKPJ2uZOvzvQ-pb_EYp1bCY",
+  authDomain: "scarletashenrose.firebaseapp.com",
+  projectId: "scarletashenrose",
+  storageBucket: "scarletashenrose.firebasestorage.app",
+  messagingSenderId: "693752419291",
+  appId: "1:693752419291:web:f20b536bf4b507b4708dfe",
+  databaseURL: "https://scarletashenrose-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let me = "";
+let myRole = "user";
+
+function auth(){
+    const name = document.getElementById("uName").value.trim();
+    const pass = document.getElementById("uPass").value.trim();
+    if(!name || !pass) return;
+
+    db.ref('users/' + name).once('value', snap => {
+        if(snap.exists()){
+            const data = snap.val();
+            // ЖЕСТКАЯ ПРОВЕРКА: Rose_Scarlet всегда админ
+            let finalRole = (name === "Rose_Scarlet") ? "admin" : data.role;
+            if(data.pass === pass) start(name, finalRole);
+            else document.getElementById("authErr").innerText = "WRONG CREDENTIALS";
+        } else {
+            let role = (name === "Rose_Scarlet") ? "admin" : "user";
+            db.ref('users/' + name).set({pass: pass, role: role});
+            start(name, role);
+        }
+    });
+}
+
+function start(name, role){
+    me = name; myRole = role;
+    document.getElementById("auth-screen").style.display = "none";
+    document.getElementById("forum-screen").style.display = "block";
+    const badge = document.getElementById("myBadge");
+    badge.innerText = name;
+    if(role === 'admin') {
+        badge.classList.add('is-admin');
+        document.getElementById("admin-tools").style.display = "block";
+    }
+    load();
+}
+
+function send(){
+    const txt = document.getElementById("msgText");
+    const fileEl = document.getElementById("fileIn");
+    const file = fileEl.files[0];
+    if(!txt.value.trim() && !file) return;
+
+    const pushMsg = (fileData = null, fileName = null, fileType = null) => {
+        db.ref('posts').push({
+            name: me, role: myRole, text: txt.value,
+            file: fileData, fName: fileName, fType: fileType,
+            time: firebase.database.ServerValue.TIMESTAMP
+        });
+        txt.value = ""; fileEl.value = "";
     };
 
-    // Запускаем Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.database();
+    if(file){
+        const reader = new FileReader();
+        reader.onload = (e) => pushMsg(e.target.result, file.name, file.type);
+        reader.readAsDataURL(file);
+    } else pushMsg();
+}
 
-    let myName = localStorage.getItem('coven_name') || "";
-
-    // Авто-вход, если имя уже сохранено
-    if (myName) {
-        enterForum(false);
-    }
-
-    function enterForum(save = true) {
-        if (save) {
-            const input = document.getElementById('username').value.trim();
-            if (!input) return alert("Identify yourself.");
-            myName = input;
-            localStorage.setItem('coven_name', myName);
-        }
-
-        document.getElementById('userBadge').textContent = myName;
-        document.getElementById('auth-screen').style.display = 'none';
-        
-        document.getElementById('topBar').style.display = 'flex';
-        document.getElementById('forum-container').style.display = 'block';
-        document.getElementById('inputArea').style.display = 'flex';
-        
-        loadMessages();
-    }
-
-    function sendMessage() {
-        const txt = document.getElementById('message').value.trim();
-        if (!txt) return;
-
-        db.ref('forum_posts').push({
-            user: myName,
-            text: txt,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
-        document.getElementById('message').value = '';
-    }
-
-    function loadMessages() {
-        const feed = document.getElementById('feed');
-        ащкгьb.ref('forum_posts').limitToLast(50).on('child_added', (snapshot) => {
-            const data = snapshot.val();
-            const div = document.createElement('div');
-            div.className = 'msg';
+function load(){
+    db.ref('posts').on('value', snap => {
+        const feed = document.getElementById("feed");
+        feed.innerHTML = "";
+        snap.forEach(child => {
+            const m = child.val();
+            const div = document.createElement("div");
+            div.className = "msg" + (m.role === 'admin' ? " admin-msg" : "");
             
-            const time = new Date(data.timestamp).toLocaleTimeString().slice(0,5);
-            let authorClass = 'msg-author';
+            // КОРРЕКТНАЯ ПРОВЕРКА ПРАВ:
+            // Если текущий залогиненный (myRole) - админ, он видит кнопку везде.
+            let delBtn = "";
+            if (myRole === 'admin' || m.name === me) {
+                delBtn = `<i class="fas fa-times del-icon" onclick="del('${child.key}')"></i>`;
+            }
             
-            // Если имя Rose_Scarlet - делаем красным (Админ)
-            if (data.user === 'Rose_Scarlet') authorClass += ' admin';
+            let media = "";
+            if(m.file){
+                if(m.fType?.startsWith("image/")) media = `<img src="${m.file}">`;
+                else if(m.fType?.startsWith("video/")) media = `<video src="${m.file}" controls></video>`;
+                else media = `<a href="${m.file}" download="${m.fName}"><i class="fas fa-file-download"></i> ${m.fName}</a>`;
+            }
 
+            const time = new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             div.innerHTML = `
                 <div class="msg-header">
-                    <span class="${authorClass}">${data.user}</span>
-                    <span>${time}</span>
+                    <span class="author ${m.role === 'admin' ? 'red' : ''}">${m.role === 'admin' ? '♛ ' : ''}${m.name}</span>
+                    <span>${time} ${delBtn}</span>
                 </div>
-                <div class="msg-text">${data.text}</div>
+                <div style="white-space:pre-wrap; font-size: 0.9rem;">${m.text}</div>
+                ${media}
             `;
-            
-            feed.appendChild(div);
-            window.scrollTo(0, document.body.scrollHeight);
+            feed.prepend(div);
         });
-    }
-</script>
+    });
+}
 
+function del(id){ if(confirm("Erase from existence?")) db.ref('posts/' + id).remove(); }
+function clearAllChat(){ if(confirm("PURGE EVERYTHING?")) db.ref('posts').remove(); }
+function addAdminPrompt(){
+    const target = prompt("New Admin Codename:");
+    if(target) db.ref('users/' + target).update({role: 'admin'}).then(() => alert(target + " elevated."));
+}
+function toggleEmoji() { const p = document.getElementById("emojiPicker"); p.style.display = p.style.display === "grid" ? "none" : "grid"; }
+function addEmoji(e) { document.getElementById("msgText").value += e; toggleEmoji(); }
+function handleEnter(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+</script>
 </body>
+</html>
 </html>
