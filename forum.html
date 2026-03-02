@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Coven | Inner Circle</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+    :root { --accent: #8a0000; --bg: #050505; --text: #c0c0c0; --card: rgba(20, 20, 20, 0.95); }
+    body { margin: 0; background-color: var(--bg); background-image: linear-gradient(to bottom, #0a0000, #000000); color: var(--text); font-family: 'Montserrat', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    
+    /* Верхняя панель */
+    .top-bar { width: 100%; padding: 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; background: rgba(0,0,0,0.8); position: sticky; top: 0; z-index: 10; }
+    .back-btn { text-decoration: none; color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+    .back-btn:hover { color: var(--accent); }
+    .user-badge { border: 1px solid #333; padding: 5px 15px; font-family: 'Cinzel', serif; font-size: 0.8rem; color: #fff; }
+
+    h1 { font-family: 'Cinzel', serif; color: #fff; letter-spacing: 4px; margin-top: 40px; text-shadow: 0 0 15px var(--accent); }
+
+    /* Окно входа */
+    #auth-screen { position: fixed; inset: 0; background: #000; z-index: 99; display: flex; align-items: center; justify-content: center; }
+    .auth-box { border: 1px solid #333; padding: 40px; text-align: center; background: var(--card); box-shadow: 0 0 30px rgba(138,0,0,0.3); width: 320px; }
+    
+    /* Формы */
+    input, textarea { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 12px; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; outline: none; text-align: center; }
+    input:focus, textarea:focus { border-color: var(--accent); }
+    textarea { text-align: left; resize: vertical; min-height: 80px; }
+    
+    button { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 10px 30px; cursor: pointer; font-family: 'Cinzel', serif; text-transform: uppercase; transition: 0.3s; width: 100%; font-weight: bold; }
+    button:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent); }
+
+    /* Лента сообщений */
+    #forum-container { display: none; width: 100%; max-width: 800px; padding: 20px; box-sizing: border-box; padding-bottom: 100px; }
+    .feed { display: flex; flex-direction: column; gap: 20px; margin-top: 30px; }
+    .msg { background: rgba(255,255,255,0.02); border-left: 2px solid #333; padding: 15px; animation: fadeIn 0.5s; position: relative; }
+    .msg:hover { border-color: var(--accent); background: rgba(255,255,255,0.04); }
+    .msg-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #555; }
+    .msg-author { font-family: 'Cinzel', serif; color: #ddd; font-weight: bold; font-size: 1rem; }
+    .msg-author.admin { color: #ff3333; text-shadow: 0 0 8px red; }
+    .msg-text { white-space: pre-wrap; line-height: 1.5; color: #ccc; }
+    
+    .input-area { position: fixed; bottom: 0; left: 0; width: 100%; background: #050505; border-top: 1px solid #333; padding: 20px; display: flex; justify-content: center; gap: 10px; }
+    .input-wrapper { width: 100%; max-width: 800px; display: flex; gap: 10px; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
+</style>
+</head>
+<body>
+
+<div id="auth-screen">
+    <div class="auth-box">
+        <h2 style="font-family:'Cinzel',serif; color:#fff; margin-bottom:30px;">Identity Required</h2>
+        <input type="text" id="username" placeholder="Enter Codename">
+        <button onclick="enterForum()">Enter The Coven</button>
+        <br><br>
+        <a href="index.html" style="color:#444; font-size:0.8rem; text-decoration:none;">Go Back</a>
+    </div>
+</div>
+
+<div class="top-bar" id="topBar" style="display:none;">
+    <a href="index.html" class="back-btn"><i class="fas fa-chevron-left"></i> Main Page</a>
+    <div class="user-badge" id="userBadge">Guest</div>
+</div>
+
+<div id="forum-container">
+    <h1>Inner Circle Forum</h1>
+    <div id="feed" class="feed"></div>
+</div>
+
+<div class="input-area" id="inputArea" style="display:none;">
+    <div class="input-wrapper">
+        <textarea id="message" placeholder="Write your message..." rows="1" style="margin:0; text-align:left;"></textarea>
+        <button onclick="sendMessage()" style="width: auto;"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<script>
+    // --- ТВОИ НАСТРОЙКИ (Взяты с твоего фото) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAF5-GRVfamtKPJ2uZOvzvQ-pb_EYp1bCY",
+      authDomain: "scarletashenrose.firebaseapp.com",
+      projectId: "scarletashenrose",
+      storageBucket: "scarletashenrose.firebasestorage.app",
+      messagingSenderId: "693752419291",
+      appId: "1:693752419291:web:f20b536bf4b507b4708dfe",
+      measurementId: "G-YMPDRZZZ2G",
+      // База данных (добавил на основе твоего ID)
+      databaseURL: "https://scarletashenrose-default-rtdb.firebaseio.com"
+    };
+
+    // Запускаем Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    let myName = localStorage.getItem('coven_name') || "";
+
+    // Авто-вход, если имя уже сохранено
+    if (myName) {
+        enterForum(false);
+    }
+
+    function enterForum(save = true) {
+        if (save) {
+            const input = document.getElementById('username').value.trim();
+            if (!input) return alert("Identify yourself.");
+            myName = input;
+            localStorage.setItem('coven_name', myName);
+        }
+
+        document.getElementById('userBadge').textContent = myName;
+        document.getElementById('auth-screen').style.display = 'none';
+        
+        document.getElementById('topBar').style.display = 'flex';
+        document.getElementById('forum-container').style.display = 'block';
+        document.getElementById('inputArea').style.display = 'flex';
+        
+        loadMessages();
+    }
+
+    function sendMessage() {
+        const txt = document.getElementById('message').value.trim();
+        if (!txt) return;
+
+        db.ref('forum_posts').push({
+            user: myName,
+            text: txt,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+        document.getElementById('message').value = '';
+    }
+
+    function loadMessages() {
+        const feed = document.getElementById('feed');
+        ащкгьb.ref('forum_posts').limitToLast(50).on('child_added', (snapshot) => {
+            const data = snapshot.val();
+            const div = document.createElement('div');
+            div.className = 'msg';
+            
+            const time = new Date(data.timestamp).toLocaleTimeString().slice(0,5);
+            let authorClass = 'msg-author';
+            
+            // Если имя Rose_Scarlet - делаем красным (Админ)
+            if (data.user === 'Rose_Scarlet') authorClass += ' admin';
+
+            div.innerHTML = `
+                <div class="msg-header">
+                    <span class="${authorClass}">${data.user}</span>
+                    <span>${time}</span>
+                </div>
+                <div class="msg-text">${data.text}</div>
+            `;
+            
+            feed.appendChild(div);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    }
+</script>
+
+</body>
+</html>
