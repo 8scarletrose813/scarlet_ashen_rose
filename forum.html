@@ -135,62 +135,72 @@ textarea:focus { border-color: var(--accent); }
 </div>
 
 <script>
-   // 1. Удали лишние повторы! Оставь только этот конфиг:
+    // 1. Конфигурация твоего проекта ScarletAshenRose
 const firebaseConfig = {
-  apiKey: "AIzaSyAF5-GRVfamtKPJ2uZOVzvQ-pb_EYp1bCY",
-  authDomain: "scarletashenrose.firebaseapp.com",
-  databaseURL: "https://scarletashenrose-default-rtdb.firebaseio.com",
-  projectId: "scarletashenrose",
-  storageBucket: "scarletashenrose.appspot.com",
-  messagingSenderId: "...",
-  appId: "..."
+    apiKey: "AIzaSyAF5-GRVfamtKPJ2uZOVzvQ-pb_EYp1bCY",
+    authDomain: "scarletashenrose.firebaseapp.com",
+    databaseURL: "https://scarletashenrose-default-rtdb.firebaseio.com",
+    projectId: "scarletashenrose",
+    storageBucket: "scarletashenrose.appspot.com",
+    messagingSenderId: "...",
+    appId: "..."
 };
 
-// 2. Инициализация (только ОДИН раз)
+// 2. Инициализация (исправлено: только один раз)
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.database(); // Теперь 'db' определена правильно
-  const auth = firebase.auth();   // Теперь 'auth' не будет выдавать ошибку
-
-  // Твоя функция для кнопки должна выглядеть примерно так:
-  function accessChannel() {
-      // Пример логики
-      console.log("Кнопка нажата, база готова!");
-      // Тут твой код для записи в базу через db.ref()...
-  }
+const db = firebase.database();
+const fbAuth = firebase.auth(); // Переименовал переменную, чтобы не было конфликта с функцией
 
 let me = "";
 let myRole = "user";
 
-function auth(){
+// 3. Функция входа (исправлено: теперь она не конфликтует с системой)
+function auth() {
     const name = document.getElementById("uName").value.trim();
     const pass = document.getElementById("uPass").value.trim();
-    if(!name || !pass) return;
+    const errBox = document.getElementById("authErr");
+    
+    if(!name || !pass) {
+        errBox.innerText = "FILL ALL FIELDS";
+        return;
+    }
 
+    // Проверяем пользователя в базе
     db.ref('users/' + name).once('value', snap => {
         if(snap.exists()){
             const data = snap.val();
-    
-            let finalRole = (name === "Rose_Scarlet") ? "admin" : data.role;
-            if(data.pass === pass) start(name, finalRole);
-            else document.getElementById("authErr").innerText = "WRONG CREDENTIALS";
+            let finalRole = (name === "Rose_Scarlet") ? "admin" : (data.role || "user");
+            
+            if(data.pass === pass) {
+                start(name, finalRole);
+            } else {
+                errBox.innerText = "WRONG CREDENTIALS";
+            }
         } else {
+            // Если пользователя нет — создаем его
             let role = (name === "Rose_Scarlet") ? "admin" : "user";
-            db.ref('users/' + name).set({pass: pass, role: role});
-            start(name, role);
+            db.ref('users/' + name).set({
+                pass: pass, 
+                role: role
+            }).then(() => {
+                start(name, role);
+            });
         }
     });
 }
 
 function start(name, role){
-    me = name; myRole = role;
+    me = name; 
+    myRole = role;
     document.getElementById("auth-screen").style.display = "none";
     document.getElementById("forum-screen").style.display = "block";
+    
     const badge = document.getElementById("myBadge");
     badge.innerText = name;
+    
     if(role === 'admin') {
         badge.classList.add('is-admin');
         document.getElementById("admin-tools").style.display = "block";
@@ -202,35 +212,42 @@ function send(){
     const txt = document.getElementById("msgText");
     const fileEl = document.getElementById("fileIn");
     const file = fileEl.files[0];
+    
     if(!txt.value.trim() && !file) return;
 
     const pushMsg = (fileData = null, fileName = null, fileType = null) => {
         db.ref('posts').push({
-            name: me, role: myRole, text: txt.value,
-            file: fileData, fName: fileName, fType: fileType,
+            name: me, 
+            role: myRole, 
+            text: txt.value,
+            file: fileData, 
+            fName: fileName, 
+            fType: fileType,
             time: firebase.database.ServerValue.TIMESTAMP
         });
-        txt.value = ""; fileEl.value = "";
+        txt.value = ""; 
+        fileEl.value = "";
     };
 
     if(file){
         const reader = new FileReader();
         reader.onload = (e) => pushMsg(e.target.result, file.name, file.type);
         reader.readAsDataURL(file);
-    } else pushMsg();
+    } else {
+        pushMsg();
+    }
 }
 
 function load(){
     db.ref('posts').on('value', snap => {
         const feed = document.getElementById("feed");
         feed.innerHTML = "";
+        
         snap.forEach(child => {
             const m = child.val();
             const div = document.createElement("div");
             div.className = "msg" + (m.role === 'admin' ? " admin-msg" : "");
             
-            // КОРРЕКТНАЯ ПРОВЕРКА ПРАВ:
-            // Если текущий залогиненный (myRole) - админ, он видит кнопку везде.
             let delBtn = "";
             if (myRole === 'admin' || m.name === me) {
                 delBtn = `<i class="fas fa-times del-icon" onclick="del('${child.key}')"></i>`;
@@ -238,16 +255,17 @@ function load(){
             
             let media = "";
             if(m.file){
-                if(m.fType?.startsWith("image/")) media = `<img src="${m.file}">`;
-                else if(m.fType?.startsWith("video/")) media = `<video src="${m.file}" controls></video>`;
+                if(m.fType && m.fType.startsWith("image/")) media = `<img src="${m.file}">`;
+                else if(m.fType && m.fType.startsWith("video/")) media = `<video src="${m.file}" controls></video>`;
                 else media = `<a href="${m.file}" download="${m.fName}"><i class="fas fa-file-download"></i> ${m.fName}</a>`;
             }
 
-            const time = new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const msgTime = m.time ? new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "just now";
+            
             div.innerHTML = `
                 <div class="msg-header">
                     <span class="author ${m.role === 'admin' ? 'red' : ''}">${m.role === 'admin' ? '♛ ' : ''}${m.name}</span>
-                    <span>${time} ${delBtn}</span>
+                    <span>${msgTime} ${delBtn}</span>
                 </div>
                 <div style="white-space:pre-wrap; font-size: 0.9rem;">${m.text}</div>
                 ${media}
@@ -257,15 +275,35 @@ function load(){
     });
 }
 
-function del(id){ if(confirm("Erase from existence?")) db.ref('posts/' + id).remove(); }
-function clearAllChat(){ if(confirm("PURGE EVERYTHING?")) db.ref('posts').remove(); }
+function del(id){ 
+    if(confirm("Erase from existence?")) db.ref('posts/' + id).remove(); 
+}
+
+function clearAllChat(){ 
+    if(confirm("PURGE EVERYTHING?")) db.ref('posts').remove(); 
+}
+
 function addAdminPrompt(){
     const target = prompt("New Admin Codename:");
     if(target) db.ref('users/' + target).update({role: 'admin'}).then(() => alert(target + " elevated."));
 }
-function toggleEmoji() { const p = document.getElementById("emojiPicker"); p.style.display = p.style.display === "grid" ? "none" : "grid"; }
-function addEmoji(e) { document.getElementById("msgText").value += e; toggleEmoji(); }
-function handleEnter(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+
+function toggleEmoji() { 
+    const p = document.getElementById("emojiPicker"); 
+    p.style.display = p.style.display === "grid" ? "none" : "grid"; 
+}
+
+function addEmoji(e) { 
+    document.getElementById("msgText").value += e; 
+    toggleEmoji(); 
+}
+
+function handleEnter(e) { 
+    if (e.key === 'Enter' && !e.shiftKey) { 
+        e.preventDefault(); 
+        send(); 
+    } 
+}
 </script>
 </body>
 </html>
