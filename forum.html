@@ -135,16 +135,25 @@ textarea:focus { border-color: var(--accent); }
 </div>
 
 <script>
-    const firebaseConfig = {
+   // 1. Удали лишние повторы! Оставь только этот конфиг:
+const firebaseConfig = {
   apiKey: "AIzaSyAF5-GRVfamtKPJ2uZOVzvQ-pb_EYp1bCY",
   authDomain: "scarletashenrose.firebaseapp.com",
-  databaseURL: "https://scarletashenrose-default-rtdb.firebaseio.com", // Проверь этот URL!
+  databaseURL: "https://scarletashenrose-default-rtdb.firebaseio.com",
   projectId: "scarletashenrose",
   storageBucket: "scarletashenrose.appspot.com",
-  // ... остальные поля
+  messagingSenderId: "...",
+  appId: "..."
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+// 2. Инициализация (только ОДИН раз)
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+// 3. Создание переменных для работы (ЧТОБЫ НЕ БЫЛО ОШИБКИ "not defined")
+const database = firebase.database();
+const db = firebase.auth(); 
 
 let me = "";
 let myRole = "user";
@@ -157,7 +166,7 @@ function auth(){
     db.ref('users/' + name).once('value', snap => {
         if(snap.exists()){
             const data = snap.val();
-            // ЖЕСТКАЯ ПРОВЕРКА: Rose_Scarlet всегда админ
+    
             let finalRole = (name === "Rose_Scarlet") ? "admin" : data.role;
             if(data.pass === pass) start(name, finalRole);
             else document.getElementById("authErr").innerText = "WRONG CREDENTIALS";
