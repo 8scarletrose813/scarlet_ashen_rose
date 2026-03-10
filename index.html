@@ -34,7 +34,6 @@
         text-transform: uppercase;
         color: #ffffff;
         margin: 0;
-        color: rgba(255, 255, 255);
     }
 
     a { text-decoration: none; color: inherit; transition: 0.4s; }
@@ -75,6 +74,7 @@
         color: #aaa;
         padding: 0 20px;
     }
+
     .skills-bar {
         display: flex;
         justify-content: center;
@@ -86,17 +86,8 @@
         flex-wrap: wrap;
     }
 
-    .skill {
-        position: relative;
-        padding: 0 10px;
-    }
-    
-    .skill::after {
-        content: '/';
-        position: absolute;
-        right: -20px;
-        color: #333;
-    }
+    .skill { position: relative; padding: 0 10px; }
+    .skill::after { content: '/'; position: absolute; right: -20px; color: #333; }
     .skill:last-child::after { content: ''; }
 
     .grid {
@@ -150,6 +141,7 @@
         border: 1px solid var(--accent);
         padding: 10px 25px;
         transition: 0.3s;
+        margin-top: auto;
     }
 
     .btn-link:hover { 
@@ -157,6 +149,7 @@
         color: #000; 
         box-shadow: 0 0 15px var(--accent);
     }
+
     footer {
         margin-top: auto;
         text-align: center;
@@ -173,17 +166,8 @@
         margin-bottom: 30px;
     }
 
-    .socials a {
-        font-size: 2rem; 
-        color: #666;
-        transition: 0.3s;
-    }
-
-    .socials a:hover { 
-        color: var(--accent); 
-        transform: scale(1.2);
-        filter: drop-shadow(0 0 8px var(--accent));
-    }
+    .socials a { font-size: 2rem; color: #666; transition: 0.3s; }
+    .socials a:hover { color: var(--accent); transform: scale(1.2); filter: drop-shadow(0 0 8px var(--accent)); }
 
     @keyframes fadeUp {
         from { opacity: 0; transform: translateY(20px); }
@@ -200,14 +184,16 @@
 </header>
 
 <section class="about">
-    <h2> 🦋Welcome to my humble site...🦋</h2>
-    <p>
+    <h2>🦋 Welcome to my humble site... 🦋</h2>
+    <div style="margin-top: 20px;">
         <p>Tea, tea, come to the rescue☕. But in life, there can never be too much tea☕.</p>
-        💜 Lavender Soul: My Arch Linux is so purple it glows. If it's not aesthetic, it's not working. 💅<br>
-        🎮 Godot Master: Creating games because playing them wasn't enough to satisfy my imagination. 🎲<br>
-        🦉 Nature: A true Night Owl. I code best when the stars are out and the tea is hot. 🍵<br>
-        🎧 Safe Space: Lost in manga panels 📖, vibing to lo-fi 🎵, and existing in my own cozy dimension. ⛩️
-    </p>
+        <p>
+            💜 Lavender Soul: My Arch Linux is so purple it glows. If it's not aesthetic, it's not working. 💅<br>
+            🎮 Godot Master: Creating games because playing them wasn't enough to satisfy my imagination. 🎲<br>
+            🦉 Nature: A true Night Owl. I code best when the stars are out and the tea is hot. 🍵<br>
+            🎧 Safe Space: Lost in manga panels 📖, vibing to lo-fi 🎵, and existing in my own cozy dimension. ⛩️
+        </p>
+    </div>
 </section>
 
 <div class="skills-bar">
@@ -220,14 +206,15 @@
 
 <div class="grid">
     <article class="card">
-        <div class="card-icon"><i class="fas fa-ghost"></i></div>
-        <h2>Buhekz</h2>
-        <p>Leaves is an ambitious cross-platform ecosystem that merges the capabilities of a modern messenger with an immersive indie-gaming foundation. Originally conceived as a Godot-based development project, it has evolved through collaborative teamwork into a high-performance communication hub powered by a cutting-edge Vue.js frontend.</p>
-        <a href="my_project.html" class="btn-link">Initialize</a>
+        <div class="card-icon"><i class="fas fa-comment-dots"></i></div>
+        <h2>Leaves</h2>
+        <p>Leaves is a lightweight, fast, and secure messenger designed for those who value privacy and simplicity.</p>
+        <a href="my_project.html" class="btn-link">Open site</a>
     </article>
+
     <article class="card">
         <div class="card-icon"><i class="fas fa-ghost"></i></div>
-        <h2>Leaves</h2>
+        <h2>Buhekz</h2>
         <p>An atmospheric survival game featuring unknown alien lifeforms. Survive the dark.</p>
         <a href="game1.html" class="btn-link">Initialize</a>
     </article>
