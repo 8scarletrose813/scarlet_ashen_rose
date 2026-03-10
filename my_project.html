@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaves | Development Update</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="icon" href="rose.png" type="image/png">
+<style>
+    :root {
+        --accent: #22c55e; /* Изменил на твой фирменный зеленый неон */
+        --bg: #050505;
+        --text: #c0c0c0;
+        --card-bg: rgba(15, 15, 15, 0.8);
+    }
+
+    body {
+        margin: 0;
+        background-color: var(--bg);
+        background-image: radial-gradient(circle at top, #0a1a0a, #000000);
+        color: var(--text);
+        font-family: 'Montserrat', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+    }
+
+    h1 {
+        font-family: 'Cinzel', serif;
+        font-weight: 400;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 10px;
+        text-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        font-size: 3rem;
+    }
+
+    .version-tag {
+        color: var(--accent);
+        font-family: 'Cinzel', serif;
+        letter-spacing: 3px;
+        margin-bottom: 30px;
+        font-size: 1.2rem;
+    }
+
+    .game-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(34, 197, 94, 0.1);
+        padding: 40px;
+        max-width: 850px;
+        width: 100%;
+        box-shadow: 0 0 40px rgba(0,0,0,0.7);
+        position: relative;
+        backdrop-filter: blur(10px);
+    }
+
+    .game-card::before {
+        content: ''; position: absolute; top:0; left:0; width:100%; height:2px;
+        background: var(--accent); box-shadow: 0 0 15px var(--accent);
+    }
+
+    .description {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: #eee;
+        margin-bottom: 30px;
+        border-left: 3px solid var(--accent);
+        padding-left: 20px;
+    }
+
+    .changelog-section {
+        margin-top: 30px;
+    }
+
+    .changelog-section h2 {
+        font-family: 'Cinzel', serif;
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #222;
+        padding-bottom: 10px;
+    }
+
+    .changelog-list {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 30px;
+    }
+
+    .changelog-list li {
+        margin-bottom: 12px;
+        padding-left: 25px;
+        position: relative;
+        font-size: 0.95rem;
+    }
+
+    .changelog-list li::before {
+        content: '▹';
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 40px;
+        background: rgba(255,255,255,0.03);
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-label { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; }
+    .stat-value { color: #fff; font-weight: 500; }
+
+    .btn-group { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+    /* Кнопка ПЕРЕЙТИ */
+    .link-btn {
+        background: transparent;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        padding: 16px 45px;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: 0.4s;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .link-btn:hover {
+        background: var(--accent);
+        color: #000;
+        box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+        transform: translateY(-2px);
+    }
+
+    .back-link {
+        color: #555;
+        text-decoration: none;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+
+    .back-link:hover { color: var(--accent); }
+
+</style>
+</head>
+<body>
+
+    <h1>Leaves</h1>
+    <div class="version-tag">Dev Update v0.a1.6</div>
+
+    <div class="game-card">
+        <div class="description">
+            <p><strong>Team Update:</strong> Leaves is evolving into a collaborative project focused on high-performance communication and unique UI/UX. This release marks a significant milestone in our front-end architecture and global connectivity.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-label">Development</span>
+                <span class="stat-value">Team Effort</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Status</span>
+                <span class="stat-value">Alpha v0.a1.6</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Engine</span>
+                <span class="stat-value">Vue.js / Godot</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Update Focus</span>
+                <span class="stat-value">Global Chat & UX</span>
+            </div>
+        </div>
+
+        <div class="changelog-section">
+            <h2>Global Chat Overhaul</h2>
+            <ul class="changelog-list">
+                <li><strong>Rich Media Rendering:</strong> Implemented auto-expansion for direct links (jpeg, jpg, gif, png, webp).</li>
+                <li><strong>Dynamic Identity:</strong> Added a custom color-hashing function. Your chat color is now uniquely generated from your username (DrBopoH vs Dr.BopoH).</li>
+                <li><strong>UI Refactoring:</strong> Complete polish of chat component layout for more intuitive navigation.</li>
+                <li><strong>Experimental Tech:</strong> Early-stage integration of Escape Codes (active testing phase).</li>
+            </ul>
+
+            <h2>System & Pipeline Fixes</h2>
+            <ul class="changelog-list">
+                <li><strong>Mobile Responsiveness:</strong> Fixed a critical breaking bug where the sidebar killed mobile adaptation. Sidebar toggle is now fully functional on web-mobile.</li>
+                <li><strong>Database Logic Fix:</strong> Corrected a high-priority bug in the message pipeline. The system now correctly fetches the <b>Last 100 messages</b> instead of the first ones.</li>
+            </ul>
+        </div>
+
+        <div class="btn-group">
+            <a href="https://drbopoh.github.io/Leaves/#/" target="_blank" class="link-btn">
+                Open Project <i class="fas fa-external-link-alt"></i>
+            </a>
+            
+            <a href="index.html" class="back-link">
+                <i class="fas fa-chevron-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
