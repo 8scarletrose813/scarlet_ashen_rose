@@ -91,6 +91,7 @@ textarea:focus { border-color: var(--accent); }
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
 <body>
 
@@ -135,7 +136,7 @@ textarea:focus { border-color: var(--accent); }
 </div>
 
 <script>
-    // 1. Конфигурация твоего проекта ScarletAshenRose
+// 1. Конфигурация твоего проекта
 const firebaseConfig = {
     apiKey: "AIzaSyAF5-GRVfamtKPJ2uZOVzvQ-pb_EYp1bCY",
     authDomain: "scarletashenrose.firebaseapp.com",
@@ -146,19 +147,19 @@ const firebaseConfig = {
     appId: "..."
 };
 
-// 2. Инициализация (исправлено: только один раз)
+// 2. Инициализация
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
 const db = firebase.database();
-const fbAuth = firebase.auth(); // Переименовал переменную, чтобы не было конфликта с функцией
+const fbAuth = firebase.auth(); 
 
 let me = "";
 let myRole = "user";
 
-// 3. Функция входа (исправлено: теперь она не конфликтует с системой)
-function auth() {
+// 3. Асинхронная функция входа (С БЕЗОПАСНЫМ АНОНИМНЫМ ВХОДОМ)
+async function auth() {
     const name = document.getElementById("uName").value.trim();
     const pass = document.getElementById("uPass").value.trim();
     const errBox = document.getElementById("authErr");
@@ -168,28 +169,36 @@ function auth() {
         return;
     }
 
-    // Проверяем пользователя в базе
-    db.ref('users/' + name).once('value', snap => {
-        if(snap.exists()){
-            const data = snap.val();
-            let finalRole = (name === "Rose_Scarlet") ? "admin" : (data.role || "user");
-            
-            if(data.pass === pass) {
-                start(name, finalRole);
+    try {
+        // Подключаемся к Firebase невидимо, чтобы пройти проверку безопасности
+        await fbAuth.signInAnonymously();
+
+        // Проверяем пользователя в базе
+        db.ref('users/' + name).once('value', snap => {
+            if(snap.exists()){
+                const data = snap.val();
+                let finalRole = (name === "Rose_Scarlet") ? "admin" : (data.role || "user");
+                
+                if(data.pass === pass) {
+                    start(name, finalRole);
+                } else {
+                    errBox.innerText = "WRONG CREDENTIALS";
+                }
             } else {
-                errBox.innerText = "WRONG CREDENTIALS";
+                // Если пользователя нет — создаем его
+                let role = (name === "Rose_Scarlet") ? "admin" : "user";
+                db.ref('users/' + name).set({
+                    pass: pass, 
+                    role: role
+                }).then(() => {
+                    start(name, role);
+                });
             }
-        } else {
-            // Если пользователя нет — создаем его
-            let role = (name === "Rose_Scarlet") ? "admin" : "user";
-            db.ref('users/' + name).set({
-                pass: pass, 
-                role: role
-            }).then(() => {
-                start(name, role);
-            });
-        }
-    });
+        });
+    } catch (error) {
+        errBox.innerText = "AUTH ERROR: " + error.message;
+        console.error(error);
+    }
 }
 
 function start(name, role){
@@ -306,5 +315,4 @@ function handleEnter(e) {
 }
 </script>
 </body>
-</html>
 </html>
