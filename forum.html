@@ -164,7 +164,7 @@ function auth(){
     const pass = document.getElementById("uPass").value.trim();
     if(!name || !pass) return;
 
-    db.ref('users/' + name).once('value', snap => {
+    auth.ref('users/' + name).once('value', snap => {
         if(snap.exists()){
             const data = snap.val();
     
@@ -173,7 +173,7 @@ function auth(){
             else document.getElementById("authErr").innerText = "WRONG CREDENTIALS";
         } else {
             let role = (name === "Rose_Scarlet") ? "admin" : "user";
-            db.ref('users/' + name).set({pass: pass, role: role});
+            auth.ref('users/' + name).set({pass: pass, role: role});
             start(name, role);
         }
     });
@@ -251,11 +251,11 @@ function load(){
     });
 }
 
-function del(id){ if(confirm("Erase from existence?")) db.ref('posts/' + id).remove(); }
-function clearAllChat(){ if(confirm("PURGE EVERYTHING?")) db.ref('posts').remove(); }
+function del(id){ if(confirm("Erase from existence?")) auth.ref('posts/' + id).remove(); }
+function clearAllChat(){ if(confirm("PURGE EVERYTHING?")) auth.ref('posts').remove(); }
 function addAdminPrompt(){
     const target = prompt("New Admin Codename:");
-    if(target) db.ref('users/' + target).update({role: 'admin'}).then(() => alert(target + " elevated."));
+    if(target) auth.ref('users/' + target).update({role: 'admin'}).then(() => alert(target + " elevated."));
 }
 function toggleEmoji() { const p = document.getElementById("emojiPicker"); p.style.display = p.style.display === "grid" ? "none" : "grid"; }
 function addEmoji(e) { document.getElementById("msgText").value += e; toggleEmoji(); }
