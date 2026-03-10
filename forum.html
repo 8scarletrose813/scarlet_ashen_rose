@@ -89,9 +89,8 @@ textarea:focus { border-color: var(--accent); }
 .del-icon:hover { color: red; transform: scale(1.2); }
 </style>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -152,9 +151,16 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-// 3. Создание переменных для работы (ЧТОБЫ НЕ БЫЛО ОШИБКИ "not defined")
-const database = firebase.database();
-const auth = firebase.auth(); 
+const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database(); // Теперь 'db' определена правильно
+  const auth = firebase.auth();   // Теперь 'auth' не будет выдавать ошибку
+
+  // Твоя функция для кнопки должна выглядеть примерно так:
+  function accessChannel() {
+      // Пример логики
+      console.log("Кнопка нажата, база готова!");
+      // Тут твой код для записи в базу через db.ref()...
+  }
 
 let me = "";
 let myRole = "user";
@@ -164,7 +170,7 @@ function auth(){
     const pass = document.getElementById("uPass").value.trim();
     if(!name || !pass) return;
 
-    auth.ref('users/' + name).once('value', snap => {
+    db.ref('users/' + name).once('value', snap => {
         if(snap.exists()){
             const data = snap.val();
     
@@ -173,7 +179,7 @@ function auth(){
             else document.getElementById("authErr").innerText = "WRONG CREDENTIALS";
         } else {
             let role = (name === "Rose_Scarlet") ? "admin" : "user";
-            auth.ref('users/' + name).set({pass: pass, role: role});
+            db.ref('users/' + name).set({pass: pass, role: role});
             start(name, role);
         }
     });
@@ -251,11 +257,11 @@ function load(){
     });
 }
 
-function del(id){ if(confirm("Erase from existence?")) auth.ref('posts/' + id).remove(); }
-function clearAllChat(){ if(confirm("PURGE EVERYTHING?")) auth.ref('posts').remove(); }
+function del(id){ if(confirm("Erase from existence?")) db.ref('posts/' + id).remove(); }
+function clearAllChat(){ if(confirm("PURGE EVERYTHING?")) db.ref('posts').remove(); }
 function addAdminPrompt(){
     const target = prompt("New Admin Codename:");
-    if(target) auth.ref('users/' + target).update({role: 'admin'}).then(() => alert(target + " elevated."));
+    if(target) db.ref('users/' + target).update({role: 'admin'}).then(() => alert(target + " elevated."));
 }
 function toggleEmoji() { const p = document.getElementById("emojiPicker"); p.style.display = p.style.display === "grid" ? "none" : "grid"; }
 function addEmoji(e) { document.getElementById("msgText").value += e; toggleEmoji(); }
